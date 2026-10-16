@@ -1,131 +1,119 @@
-# Ledger Data Quality — Python + SQL Reconciliation & Analytics Pipeline
+# Transaction Data Quality & Reconciliation
 
-> **Audit/data-quality pipeline turning mixed financial exports into a controlled, traceable ledger and exception workflow.** The project regenerates **10,150 synthetic transactions**, standardises them into SQLite, runs completeness/uniqueness/referential-integrity controls, screens duplicate-payment candidates and Benford distributions, reconciles GL totals to independent controls using a **£0.01 tolerance**, and produces KPI and exception outputs for analysis.
+A data analytics portfolio project exploring how mixed financial transaction exports can be validated, standardised, reconciled, and turned into actionable exception reports.
 
-`Python` · `SQL` · `SQLite` · `pandas` · `Reconciliation` · `Benford Screening` · `Data Controls` · `Power BI Ready`
+**Tools:** Python · SQL · SQLite · pandas · Excel/CSV · pytest · Power BI (reporting extension)
 
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://python.org)
-[![CI](https://github.com/NathS04/ledger-data-quality/actions/workflows/ci.yml/badge.svg)](https://github.com/NathS04/ledger-data-quality/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+> **Project status:** Initial baseline imported for study and improvement. The next stage is to validate the pipeline, reproduce its outputs, document findings, and add original analysis and improvements.
 
-> **Disclaimer:** This project processes **synthetic financial data** with injected defects for portfolio and analytical demonstration purposes. It is not a Deloitte or client engagement. Benford's Law and duplicate checks serve as analytical **screening tools** to prioritize human investigation, not direct proof of fraud.
+## Business problem
 
----
+Finance and operations teams often receive transaction data from multiple systems in inconsistent formats. Missing fields, invalid vendor references, duplicate-payment candidates, and differences between ledger totals and control totals can reduce confidence in reporting.
 
-## 20-second project view
+This project demonstrates an analytical workflow for surfacing those issues so a reviewer can investigate them. The included records are described as synthetic demonstration data, not transactions from a real company.
 
-| Dimension | Details |
-| :--- | :--- |
-| **Input Data** | Disjoint CSV, Excel, and legacy financial exports (10,150 synthetic transactions with realistic data defects). |
-| **Pipeline Architecture** | Python ingestion → standardisation & cleansing → SQLite database → data quality & control testing → anomaly detection → exception reporting. |
-| **Data Controls** | Completeness (>95% threshold), uniqueness (transaction ID deduplication), referential integrity (vendor master reconciliation). |
-| **Reconciliation** | Period ledger balance check reconciled against independent control totals within a strict **£0.01 tolerance**. |
-| **Analytics & Screening** | Duplicate-payment candidate detection (vendor + amount + 3-day window) & Benford's Law leading-digit chi-square screening. |
-| **Reporting Outputs** | Structured exception CSVs, executive KPI metrics, Benford frequency breakdown, and Power BI-ready data models. |
+## What the project covers
 
----
-
-## Why this matters
-
-> **Technical data controls convert raw financial exports into decision-grade information.**
-
-In technical consulting and solutions engineering, clients rarely present clean, ready-to-use data. The core challenge is not merely writing SQL queries, but building automated controls that verify data integrity, reconcile disjoint sources, and highlight exact operational anomalies so analysts and auditors know precisely where to investigate.
-
----
+| Area | Analysis |
+|---|---|
+| Data ingestion | Read transaction exports from CSV and Excel files |
+| Standardisation | Clean and prepare records for analysis in SQLite |
+| Data quality | Check required fields, transaction ID uniqueness, and vendor references |
+| Reconciliation | Compare ledger totals with supplied control totals using a configurable tolerance |
+| Exception screening | Identify duplicate-payment candidates and unusual first-digit distributions for review |
+| Reporting | Produce KPI, reconciliation, Benford-screening, and exception CSV outputs |
 
 ## Workflow
 
 ```mermaid
 flowchart TD
-    A[Raw CSV and Excel exports] --> B[Ingest]
-    B --> C[Clean and standardise]
-    C --> D[(SQLite ledger)]
-    D --> E[Controls and reconciliation]
-    D --> F[Duplicate and Benford screening]
-    E --> G[Exception and KPI outputs]
+    A[CSV and Excel exports] --> B[Ingest and standardise]
+    B --> C[(SQLite ledger)]
+    C --> D[Data-quality checks]
+    C --> E[Reconciliation]
+    C --> F[Exception screening]
+    D --> G[KPI and exception outputs]
+    E --> G
     F --> G
-    G --> H[Power BI Desktop]
+    G --> H[Business review and reporting]
 ```
 
----
+## Repository structure
 
-## Audit & Analytics Value
+```text
+.
+├── data/
+│   ├── raw/                 # Synthetic input files
+│   └── processed/           # Generated local database (ignored by Git)
+├── outputs/                 # Example KPI, reconciliation and exception outputs
+├── src/                     # Ingestion, cleaning, controls and pipeline code
+├── tests/                   # Automated checks
+├── requirements.txt
+└── README.md
+```
 
-| Audit objective | Analytics performed | Decision support |
-|---|---|---|
-| **Risk assessment** | Profiles missing critical fields, orphan vendors, duplicate-payment candidates, and unusual first-digit distributions. | Focuses walkthroughs, substantive procedures, and discussions with process owners on higher-risk populations. |
-| **Controls testing** | Tests transaction completeness, transaction-ID uniqueness, and vendor-master referential integrity. | Helps assess whether data-entry, interface, and master-data controls need further testing or remediation. |
-| **Financial-data reconciliation** | Compares actual totals by GL account with independent control totals using a £0.01 tolerance. | Establishes whether the ledger population can be relied upon and identifies accounts requiring reconciliation. |
-| **Stakeholder decisions** | Produces KPIs, exception-level data, reconciliation detail, and a concise findings report. | Gives finance leadership and those charged with governance an evidence-led basis for prioritising remediation. |
-
----
-
-## Audit Analytics Coverage
-
-| Procedure | What it tests |
-|---|---|
-| **Completeness** | Critical transaction ID, vendor, date, and amount fields are populated. |
-| **Uniqueness** | Transaction IDs appear only once. |
-| **Referential integrity** | Every populated vendor ID exists in the vendor master. |
-| **Reconciliation** | Actual GL-account totals tie to independently generated control totals within £0.01. |
-| **Duplicate-payment screening** | Vendor, invoice number, and amount combinations are repeated. |
-| **Benford screening** | First-digit frequencies are compared with Benford's expected distribution. |
-
----
-
-## Quickstart & Local Execution
+## Run locally
 
 Python 3.11 or newer is recommended.
 
-```bash
-git clone https://github.com/NathS04/ledger-data-quality.git
-cd ledger-data-quality
+### Windows PowerShell
 
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python -m src.run_pipeline
 python -m pytest -q
 ```
 
-The run is deterministic: fixed random seeds regenerate 10,150 synthetic transactions with deliberately planted missing fields, orphan vendor references, duplicate-payment candidates, reconciliation differences, and an elevated digit-9 pattern. Run against the existing raw exports without regenerating them with:
+If PowerShell blocks virtual-environment activation, you can instead invoke the environment's Python directly:
 
-```bash
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m src.run_pipeline
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
+To run the pipeline against the existing raw files without regenerating them, use:
+
+```powershell
 python -m src.run_pipeline --no-regen
 ```
 
----
+Refer to the source code and tests for the exact behaviour supported by the current implementation.
 
-## Findings and Outputs
+## Outputs
 
-- [`outputs/EXECUTIVE_FINDINGS.md`](outputs/EXECUTIVE_FINDINGS.md) — concise audit findings, risk interpretation, and recommended follow-up actions.
-- `data/processed/ledger.db` — generated local SQLite database (not committed).
-- `outputs/kpis.csv` — dashboard KPI row.
-- `outputs/exceptions_report.csv` — consolidated transaction-level exceptions.
-- `outputs/benford.csv` — observed and expected first-digit frequencies.
-- `outputs/reconciliation.csv` — GL-account control-total tie-out detail.
-- `src/queries.sql` — analyst queries for vendor spend, monthly trends, GL totals, duplicate payments, and orphan vendors.
+- `outputs/EXECUTIVE_FINDINGS.md` — current summary of findings and recommended follow-up.
+- `outputs/kpis.csv` — KPI summary for reporting.
+- `outputs/exceptions_report.csv` — transaction-level exceptions.
+- `outputs/benford.csv` — observed and expected leading-digit frequencies.
+- `outputs/reconciliation.csv` — reconciliation detail.
+- `outputs/DASHBOARD.md` — notes for building a Power BI report.
+- `src/queries.sql` — example SQL queries for exploring the data.
 
----
+The generated SQLite database is a local build artifact and is intentionally excluded from version control.
 
-## Power BI Desktop Integration
+## How to interpret the results
 
-[`outputs/DASHBOARD.md`](outputs/DASHBOARD.md) contains the step-by-step Power BI Desktop build instructions. This repository includes the reproducible source CSVs for reporting. Connect Power BI Desktop to `outputs/kpis.csv`, `outputs/exceptions_report.csv`, and `outputs/benford.csv` or directly to `data/processed/ledger.db`.
+- **Synthetic data:** any reported counts or patterns apply to the demonstration dataset, not to a real company.
+- **Duplicate candidates are not proof:** similar transactions should be reviewed against invoices, payment references, timing, and business context.
+- **Benford screening is not a fraud detector:** unusual digit distributions can have legitimate explanations and should only guide further investigation.
+- **Reconciliation tolerance:** the current £0.01 tolerance is a demonstration setting; a real organisation should define tolerance and control totals based on its accounting requirements.
+- **Association is not causation:** descriptive patterns alone do not prove why a discrepancy occurred.
 
----
+## Planned portfolio improvements
 
-## Interpretation and Limitations
+The next iterations will focus on work that can be explained and reproduced:
 
-- The data and findings are synthetic; they demonstrate an audit-analytics workflow rather than describe a real organisation.
-- Duplicate matches are candidates for investigation, not confirmed duplicate payments.
-- **Benford analysis is a screening method, not proof of fraud, error, or misconduct.** Interpret any unusual distribution with transaction-level evidence, business-process knowledge, and control evidence.
-- The reconciliation tolerance is a demonstrative £0.01 and should be agreed with the engagement team for a real audit.
+1. Validate the pipeline and document the data dictionary and business rules.
+2. Add original SQL questions and data-quality tests.
+3. Investigate the largest exception categories and explain their business implications.
+4. Develop a concise dashboard and an evidence-based action plan.
+5. Document limitations and test any proposed improvement against the data.
 
----
+## Reference and attribution
 
-## Related Portfolio Work
+The initial project baseline was informed by the public **[Ledger Data Quality repository](https://github.com/NathS04/ledger-data-quality)**. This repository is being used as a learning baseline and will be extended with independently documented analysis. Retain and follow all upstream notices and applicable licensing terms when redistributing code.
 
-- [Policy Copilot](https://github.com/NathS04/policy_copilot_submission) — Audit-Ready RAG with Citation Enforcement & Evaluation Harness
-- [EventHub](https://github.com/NathS04/comp3011-cw1-api) — Production-Style FastAPI Event API with 24 REST Endpoints & Provenance Tracking
-- [Search Engine Tool](https://github.com/NathS04/comp3011-cw2-api) — Web Crawler, Positional Inverted Index & TF-IDF Ranking Engine
-
+This is an independent educational portfolio project and is not affiliated with or commissioned by any employer, client, or audit firm.
