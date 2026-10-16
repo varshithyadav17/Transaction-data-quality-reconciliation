@@ -112,8 +112,4 @@ The next iterations will focus on work that can be explained and reproduced:
 4. Develop a concise dashboard and an evidence-based action plan.
 5. Document limitations and test any proposed improvement against the data.
 
-## Reference and attribution
-
-The initial project baseline was informed by the public **[Ledger Data Quality repository](https://github.com/NathS04/ledger-data-quality)**. This repository is being used as a learning baseline and will be extended with independently documented analysis. Retain and follow all upstream notices and applicable licensing terms when redistributing code.
-
 This is an independent educational portfolio project and is not affiliated with or commissioned by any employer, client, or audit firm.
