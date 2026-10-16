@@ -1,30 +1,32 @@
-# Executive Audit Findings
+# Executive Findings — Synthetic Accounts-Payable Dataset
 
-## Purpose and scope
+## Scope and data boundary
 
-This concise report summarises the deterministic results produced by the ledger data-quality pipeline. It is an independent, synthetic portfolio exercise designed to demonstrate audit analytics techniques; it does not describe a real Deloitte engagement or a real organisation's financial records.
+This report summarises the example outputs produced by the repository pipeline. The ledger, vendor master, and GL control totals are synthetic and intentionally include planted quality issues. This is an educational portfolio analysis, not the result of a real audit engagement.
 
 ## Findings at a glance
 
-| Audit analytics area | Result | Audit relevance |
+| Control / screen | Example result | Business relevance |
 |---|---:|---|
-| Critical-field completeness | 130 transactions have a missing critical field: 60 amounts, 30 transaction dates, and 40 vendor IDs. | Incomplete fields can impair period allocation, supplier testing, payment analysis, and the reliability of downstream reporting. |
-| Vendor-master integrity | 79 transactions reference a populated vendor ID that is absent from the vendor master. | Orphan references indicate potential master-data, interface, or approval-control weaknesses. |
-| Financial-data reconciliation | All 6 GL accounts have a variance against their independent control total. | The ledger population does not tie to the control totals and needs investigation before it is relied upon for audit testing. |
-| Duplicate-payment screening | 290 transactions share the same vendor, invoice number, and amount as another transaction. | These are potential duplicate payments or repeat postings requiring corroborative evidence. |
-| Benford first-digit screening | Digit 9 occurs in 5.39% of populated amounts (544 items), compared with a 4.58% Benford expectation. | The excess identifies a focused population for follow-up, alongside the full population and business context. |
+| Population size | 10,150 rows | Establishes the population used in the checks |
+| Distinct vendors | 275 | Vendor master population in this sample |
+| Missing critical fields | 130 rows | Missing amount, date, or vendor fields weaken downstream analysis |
+| Orphan vendor references | 79 rows | Transactions refer to IDs not present in the vendor master |
+| GL reconciliation breaks | 6 accounts | Ledger totals do not match the supplied synthetic controls |
+| Duplicate-payment candidates | 290 rows | Candidate groups require document-level corroboration |
+| Benford mean absolute deviation | 0.00271 (labelled “close” by this code) | A population-level screen; not a verdict |
 
-The overall Benford mean absolute deviation is 0.00271, classified by this pipeline as **close**. The elevated digit-9 frequency should be treated as a targeted screening observation rather than a conclusion about the whole ledger.
+Counts can overlap because a record may fail more than one control. The 290 duplicate candidates are rows in matching groups, not necessarily 290 distinct duplicate payments or a confirmed loss amount.
 
-## Recommended audit follow-up
+## Recommended analyst follow-up
 
-1. **Establish data reliability.** Obtain the source-system extract criteria, field mapping, and data lineage; reconcile record counts and investigate the missing vendor, date, and amount fields with management.
-2. **Test master-data controls.** Inspect the vendor onboarding and change-management controls for the 79 orphan references, including interface-error reports and evidence of timely remediation.
-3. **Resolve ledger-to-control variances.** Agree each GL-account variance to a reconciling item, determine whether it is a timing, mapping, completeness, or posting issue, and assess the effect on the audit population.
-4. **Investigate duplicate-payment candidates.** Select risk-based samples from the 290 candidates and inspect invoices, purchase orders, goods-received evidence, payment runs, credit notes, and duplicate-payment recovery activity.
-5. **Use the digit-9 population for targeted testing.** Consider substantive testing of unusual amounts, manual journals, round-number patterns, approvers, and posting periods, while assessing whether the underlying population is suitable for Benford analysis.
-6. **Escalate and communicate.** Summarise validated exceptions, control owners, remediation dates, and residual risk for finance leadership and those charged with governance.
+1. Validate the source population, extraction criteria, completeness, and file lineage.
+2. Investigate missing critical fields with data owners and quantify their effect on downstream reports.
+3. Trace orphan vendor IDs to master-data changes, interface errors, or timing differences.
+4. Break reconciliation variances down by account and period; agree each item to evidence rather than merely changing tolerance.
+5. Sample duplicate candidates and compare invoice number, vendor, amount, dates, payment reference, credit notes, and approval trail.
+6. Use Benford deviations only when the amount population is appropriate for the technique; consider transaction-level context and other risk signals.
 
 ## Interpretation boundary
 
-**Benford analysis is a screening method, not proof of fraud, error, or misconduct.** Any exception must be evaluated with transaction-level evidence, the business process, and the relevant control environment before drawing an audit conclusion.
+Benford screening and duplicate matching identify items for human review. Neither establishes fraud. The supplied control totals are deliberately separate from the final modified transaction population; therefore, these reconciliation breaks are a demonstration scenario, not evidence of a real accounting misstatement.
