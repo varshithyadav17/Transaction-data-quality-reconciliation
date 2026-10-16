@@ -76,6 +76,16 @@ To use the checked-in inputs without regenerating them, run: python -m src.run_p
 
 See docs/data_dictionary.md for field meanings and docs/interview_walkthrough.md for the business rationale, methodology, and limitations.
 
+## Business Analyst case-study artifacts
+
+The links below document the hypothetical business problem, scope, requirements, stakeholder communication, process-improvement hypothesis, user stories, acceptance criteria, and KPI measurement approach. These are portfolio artifacts—not evidence of real stakeholder interviews, company adoption, or achieved operational impact.
+
+- [Business requirements brief](docs/business_requirements.md)
+- [Stakeholder and communication plan](docs/stakeholder_and_communication_plan.md)
+- [As-is / to-be process improvement case](docs/process_improvement_case.md)
+- [User stories and acceptance criteria](docs/user_stories_acceptance_criteria.md)
+- [KPI and measurement plan](docs/kpi_measurement_plan.md)
+
 ## Interpretation and limitations
 
 - Duplicate matches are **candidates**; confirm them against invoices, payment references, posting dates, credit notes, and the approval trail.
